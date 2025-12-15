@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CSC 493 ChatBot</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+    
+  <div class="app">
+    <!-- Top bar -->
+    <header class="topbar">
+      <button id="menuToggle"
+              class="iconbtn"
+              aria-label="Open quick asks menu"
+              aria-controls="drawer"
+              aria-expanded="false">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </button>
+      <h1 class="brand">Tuishin’ You Well Bot — Berea College</h1>
+      <div class="spacer" aria-hidden="true"></div>
+    </header>
+
+    <!-- Drawer + scrim -->
+    <div id="scrim" class="scrim" hidden></div>
+    <aside id="drawer" class="drawer" aria-label="Quick asks and shortcuts">
+      <div class="drawer-head">
+        <h2>Menu</h2>
+        <button id="closeDrawer" class="iconbtn" aria-label="Close menu">
+          <span class="xbar"></span><span class="xbar"></span>
+        </button>
+      </div>
+
+      <!-- Session actions grouped/clean -->
+      <div class="drawer-section">
+        <h3>Session</h3>
+        <div class="stack">
+          <button id="clear" class="btn ghost full" title="Start a new chat">New chat</button>
+          <button
+            id="savePdf"
+            class="btn full"
+            title="Save chat is only available when you continue with an account." 
+            disabled
+            data-requires-account="true">
+            Save chat (PDF)
+          </button>
+            <button
+            id="SavedChats"
+            class="btn full"
+            title="This should be available when you sign in with an account"
+            data-requires-account="true">
+            Saved Chats
+          </button>
+        </div>
+      </div>
+
+      <div class="drawer-section">
+        <h3>Quick asks</h3>
+        <div class="tags" id="tags"></div>
+      </div>
+
+      <div class="drawer-section" id="howto">
+        <h3>How to use</h3>
+        <ol class="howto-list">
+          <li>Ask in one clear sentence (e.g., “Deadlines for Fall admissions?”).</li>
+          <li>\Click on the "Quick Asks" for quick questions.</li>
+          <li>Follow the link when provided answers to official pages.</li>
+          <li>Use “New chat” to reset context.</li>
+        </ol>
+      </div>
+
+      <div class="drawer-foot">
+        <!-- Account mode -->
+        <button id="accountBtn" class="btn ghost full account-btn" type="button">
+          Account
+        </button>
+        <p class="drawer-foot-note">
+          Unofficial demo chatbot. Not affiliated with Berea College. CSC 493 capstone. Created by Valentin Rama.
+        </p>
+      </div>
+    </aside>
+
+    <!-- Print PDF -->
+    <div id="printHeader" hidden></div>
+
+    <!-- Landing overlay -->
+    <section id="landing" class="landing" aria-label="Landing options">
+      <div class="landing-card">
+        <h2>Welcome</h2>
+        <p>Choose how you’d like to continue.</p>
+        <div class="landing-actions">
+          <button id="continueAccount" class="btn primary full">Continue with Account</button>
+          <button id="continueGuest" class="btn ghost full">Continue without Account</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Login -->
+    <section id="loginOverlay" class="landing" aria-label="Demo login">
+      <div class="landing-card">
+        <h2>Sign in (demo)</h2>
+        <p>You can type an email and password or just continue without filling anything in.</p>
+        <form id="loginForm" class="login-form">
+          <label class="login-field">
+            <span>Email</span>
+            <input id="loginEmail" type="email" placeholder="you@example.com" autocomplete="off" />
+          </label>
+          <label class="login-field">
+            <span>Password</span>
+            <input id="loginPassword" type="password" placeholder="••••••••" autocomplete="off" />
+          </label>
+          <button id="loginContinue" class="btn primary full" type="submit">
+            Continue to chatbot
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Main app -->
+    <main class="shell" aria-live="polite">
+      <section id="chat" class="chat" aria-live="polite"></section>
+      <form id="form" class="composer" autocomplete="off">
+        <input id="text" class="field" name="q" placeholder="Type your question..." aria-label="Message input"/>
+        <button id="send" class="btn primary" type="submit">Send</button>
+      </form>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
