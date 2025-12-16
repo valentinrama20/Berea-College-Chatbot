@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CSC 493 ChatBot</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Berea College Chatbot - Valentin Rama</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-    
+
   <div class="app">
+
     <!-- Top bar -->
     <header class="topbar">
-      <button id="menuToggle"
-              class="iconbtn"
-              aria-label="Open quick asks menu"
-              aria-controls="drawer"
-              aria-expanded="false">
+      <button id="menuToggle" class="iconbtn" aria-label="Open quick asks menu" aria-controls="drawer"
+        aria-expanded="false">
         <span class="bar"></span><span class="bar"></span><span class="bar"></span>
       </button>
       <h1 class="brand">Tuishin’ You Well Bot — Berea College</h1>
@@ -37,18 +37,12 @@
         <h3>Session</h3>
         <div class="stack">
           <button id="clear" class="btn ghost full" title="Start a new chat">New chat</button>
-          <button
-            id="savePdf"
-            class="btn full"
-            title="Save chat is only available when you continue with an account." 
-            disabled
-            data-requires-account="true">
+          <button id="savePdf" class="btn full" title="Save chat is only available when you continue with an account."
+            disabled data-requires-account="true">
             Save chat (PDF)
           </button>
-            <button
-            id="SavedChats"
-            class="btn full"
-            title="This should be available when you sign in with an account"
+
+          <button id="SavedChats" class="btn full" title="This should be available when you sign in with an account"
             data-requires-account="true">
             Saved Chats
           </button>
@@ -121,7 +115,7 @@
     <main class="shell" aria-live="polite">
       <section id="chat" class="chat" aria-live="polite"></section>
       <form id="form" class="composer" autocomplete="off">
-        <input id="text" class="field" name="q" placeholder="Type your question..." aria-label="Message input"/>
+        <input id="text" class="field" name="q" placeholder="Type your question..." aria-label="Message input" />
         <button id="send" class="btn primary" type="submit">Send</button>
       </form>
     </main>
@@ -129,4 +123,5 @@
 
   <script src="script.js"></script>
 </body>
+
 </html>
