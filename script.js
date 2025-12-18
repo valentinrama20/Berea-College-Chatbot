@@ -111,6 +111,7 @@ const QUICK = [
 ];
 
 // simple defaults so code runs even without extra data
+
 const EXPAND = {};
 const FOLLOWUPS = {};
 
@@ -283,3 +284,56 @@ const accountBtn      = document.getElementById('accountBtn');
 
 let lastTopic   = null;
 let currentMode = null; 
+
+// Utilities
+
+function escapeHtml(str){
+  return str.replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+function linkify(text){
+  const urlRe = /((?:https?:\/\/|file:\/\/)[^\s]+)/gi;
+  const safe = escapeHtml(text);
+  return safe.replace(urlRe, (m)=>`<a href="${m}" target="_blank" rel="noopener">${m}</a>`);
+}
+function addBubble(text, who='bot', asHtml=false){
+  const div = document.createElement('div');
+  div.className = `msg ${who}`;
+  if (asHtml) {
+    div.innerHTML = text;
+  } else {
+    div.innerHTML = (who === 'me') ? linkify(text) : escapeHtml(text);
+  }
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  return div;
+}
+function addLoadingBubble(){
+  const div = document.createElement('div');
+  div.className = 'msg bot loading';
+  div.innerHTML = '<span class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>';
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  return div;
+}
+function disableForm(disabled){ input.disabled = disabled; sendBtn.disabled = disabled; }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+async function typewriterInto(el, text, chunk=3, delay=12){
+  el.textContent = "";
+  let i = 0;
+  while (i < text.length){
+    el.textContent += text.slice(i, i+chunk);
+    i += chunk;
+    chatBox.scrollTop = chatBox.scrollHeight;
+    await sleep(delay);
+  }
+}
+function stripToText(html){
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return (tmp.textContent || tmp.innerText || '').trim();
+}
+function renderProgressiveHTML(el, html){
+  el.classList.remove('loading');
+  el.innerHTML = html;
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
