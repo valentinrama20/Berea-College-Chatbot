@@ -337,3 +337,30 @@ function renderProgressiveHTML(el, html){
   el.innerHTML = html;
   chatBox.scrollTop = chatBox.scrollHeight;
 }
+
+/* Save-as-PDF */
+function formatNow(){
+  const d = new Date();
+  return d.toLocaleString(undefined, {
+    weekday:'short', year:'numeric', month:'short', day:'2-digit',
+    hour:'2-digit', minute:'2-digit'
+  });
+}
+function saveChatAsPDF(){
+  // This section to only allow when in account mode
+  if (currentMode !== 'account') {
+    alert('Saving chat as PDF is only available when you continue with an account.');
+    return;
+  }
+
+  if (!chatBox || chatBox.children.length === 0){
+    alert('No messages yet. Ask something first, then try again.');
+    return;
+  }
+  if (printHdr){
+    printHdr.textContent = `Tuishin' You Well Bot — Chat transcript • ${formatNow()}`;
+  }
+  const loaders = chatBox.querySelectorAll('.msg.loading');
+  loaders.forEach(l => l.classList.remove('loading'));
+  window.print();
+}
