@@ -364,3 +364,178 @@ function saveChatAsPDF(){
   loaders.forEach(l => l.classList.remove('loading'));
   window.print();
 }
+
+
+// Private recommendations
+
+function saveRecommendations(topic){
+  const rec = FOLLOWUPS[topic] || [];
+  if (!rec.length) return;
+  const key = 'berea_recos';
+  const store = JSON.parse(localStorage.getItem(key) || '{}');
+  const merged = new Set([...(store[topic] || []), ...rec]);
+  store[topic] = Array.from(merged);
+  localStorage.setItem(key, JSON.stringify(store));
+}
+function getRecommendations(topic){
+  const key = 'berea_recos';
+  const store = JSON.parse(localStorage.getItem(key) || '{}');
+  return store[topic] || [];
+}
+
+
+// Casual tone helpers
+
+function casualIntro(topic, q) {
+  const labels = {
+    location:   "You’re asking where Berea is.",
+    tuition:    "You’re wondering how tuition and costs work.",
+    labor:      "You’re asking about the Labor Program and campus jobs.",
+    admissions: "You’re asking about getting into Berea.",
+    majors:     "You’re asking what you can study here.",
+    housing:    "You’re asking about housing and dining.",
+    intl:       "You’re asking about international student stuff.",
+    studyabroad:"You’re asking about studying abroad from Berea.",
+    aid:        "You’re asking about financial aid beyond tuition.",
+    visit:      "You’re asking about visiting campus.",
+    contact:    "You’re asking how to reach the right office.",
+    career:     "You’re asking about careers or internships.",
+    about:      "You’re asking what Berea College is about.",
+    faculty:    "You’re asking about faculty and classes.",
+    registrar:  "You’re asking about registration or transcripts.",
+    library:    "You’re asking about the library and research.",
+    it:         "You’re asking about tech or account help.",
+    counseling: "You’re asking about counseling or mental health support.",
+    health:     "You’re asking about health services.",
+    accessibility:"You’re asking about accessibility or accommodations.",
+    safety:     "You’re asking about campus safety.",
+    parking:    "You’re asking about parking or permits.",
+    bookstore:  "You’re asking about the bookstore or textbooks.",
+    studentlife:"You’re asking about student life and activities.",
+    orientation:"You’re asking about new student orientation.",
+    tutoring:   "You’re asking about tutoring or academic support.",
+    chapel:     "You’re asking about chapel or spiritual life.",
+    athletics:  "You’re asking about sports and athletics.",
+    accounts:   "You’re asking about billing or student accounts.",
+    service:    "You’re asking about service or volunteering.",
+    events:     "You’re asking about campus events."
+  };
+
+  const label = labels[topic];
+  if (!label) {
+    return "Here’s the quick version, then some links if you want details.";
+  }
+  return label + " Here’s the simple version.";
+}
+
+// Sub-intent routing
+
+function specificAnswer(topic, q){
+  const lq = q.toLowerCase();
+
+  if (topic === "admissions"){
+    if (/deadline|due|when\b.*(apply|application)/.test(lq) || /\bdeadlines?\b/.test(lq)){
+      return "Deadlines change by term and by whether you are first-year, transfer, or international. The safest move is to check the Deadlines & Requirements page, then start your application in the online portal.";
+    }
+    if (/gpa|requirement|requirements?|sat|act|test/.test(lq)){
+      return "Berea uses a holistic review. Test scores can be optional. Make sure you read the Admissions Information page for what they want to see: transcripts, recommendations, essays, and any test scores you plan to send.";
+    }
+    if (/transfer/.test(lq)){
+      return "Transfers follow their own process and timeline. Before you apply, read the Transfer Students section so you understand how your previous courses will be reviewed and what dates matter for you.";
+    }
+  }
+
+  if (topic === "tuition"){
+    if (/cover|covered|not covered|fees|room|board|books|expenses|costs?/.test(lq)){
+      return "The Tuition Promise covers tuition only. You still need a plan for housing, meals, books, and fees. The Cost of Attendance page gives a good breakdown so you can see the bigger picture.";
+    }
+    if (/qualif|eligib|how.*qualify/.test(lq)){
+      return "To benefit from the Tuition Promise, you first need to be admitted and show financial need. The No Tuition page explains the basics, and Financial Aid can walk through your specific situation.";
+    }
+  }
+
+  if (topic === "aid"){
+    if (/cost of attendance|coa|estimate|budget/.test(lq)){
+      return "Use the Cost of Attendance chart as your starting budget for housing, meals, books, personal, and travel costs. Then think about how need-based aid plus campus earnings can help cover those pieces.";
+    }
+    if (/award|package|letter|how much/.test(lq)){
+      return "Your aid award puts together grants, scholarships, and campus earnings. The 'Understanding Your Aid Award' page explains how it all fits. For detailed numbers, it’s best to talk directly with Student Financial Aid or Student Accounts.";
+    }
+  }
+
+  if (topic === "labor"){
+    if (/how many|hours|schedule/.test(lq)){
+      return "Most students work around 10 hours per week. Your exact schedule gets set up with your labor department and supervisor, usually during orientation or early in the term.";
+    }
+    if (/pay|wage|salary/.test(lq)){
+      return "Pay is based on the Labor Program pay scale. Your assignment level affects your rate, so checking the pay schedule is the easiest way to see what to expect.";
+    }
+    if (/first[- ]?year|freshman|first year|new student/.test(lq)){
+      return "First-year students can be placed in lots of different roles across campus offices, student life, facilities, IT, and more. You’ll get guidance during labor onboarding so you aren’t guessing on your own.";
+    }
+  }
+
+  if (topic === "majors"){
+    if (/list|which|what (are|is) (the )?majors|programs?/.test(lq)){
+      return "For the full list of majors and minors, go straight to the Majors & Minors page. If you want details on requirements and classes, the Catalog is the best place to read through.";
+    }
+    if (/calendar|when.*(term|semester)/.test(lq)){
+      return "If you’re planning around terms and breaks, the Academic Calendar is the place to check dates for each semester, registration windows, and holidays.";
+    }
+  }
+
+  if (topic === "housing"){
+    if (/meal|dining|plan/.test(lq)){
+      return "Meal plans connect to both where you live and your student status. The Housing & Dining page walks through the different plan options and how to request a change if you need it.";
+    }
+    if (/policy|policies|rules/.test(lq)){
+      return "Housing policies cover things like visitation, quiet hours, and safety rules. Housing & Residence Life posts these policies so you can read them before you pick or change a room.";
+    }
+  }
+
+  if (topic === "intl"){
+    if (/visa|i-20|sevis|embassy|consulate/.test(lq)){
+      return "Once you’re admitted and your finances are documented, you can move into the I-20 and visa steps. International Student Services is the office that helps you with SEVIS, embassy appointments, and the details.";
+    }
+    if (/english|toefl|ielts|duolingo|proficien/.test(lq)){
+      return "Berea accepts several ways to show English proficiency, including approved tests. The International FAQs list the options so you can see which one fits you best.";
+    }
+  }
+
+  if (topic === "visit"){
+    if (/book|schedule|reserve|appointment/.test(lq)){
+      return "To lock in a visit, use the online scheduler for daily campus visits. If you’re bringing a group, use the Group Visits form. If you can’t travel, the Virtual Tour is an easy way to see campus from home.";
+    }
+    if (/virtual|online tour/.test(lq)){
+      return "If you just want to get a feel for campus from a distance, the Virtual Tour is a quick way to look around buildings and spaces without having to travel.";
+    }
+  }
+
+  if (topic === "career"){
+    if (/internship|internships?/.test(lq)){
+      return "Career Development can help you find and prepare for internships by checking your résumé, coaching you on search strategies, and connecting you to employers. A good first step is to book a résumé review and then explore their internship resources.";
+    }
+    if (/resume|cv|cover letter|interview/.test(lq)){
+      return "If you want help with a résumé, cover letter, or interview prep, book a Career Development appointment. They also run workshops and employer events where you can practice and get feedback.";
+    }
+    if (/job fair|employer|event|workshop/.test(lq)){
+      return "Keep an eye on Career Development events like job fairs, employer talks, and skills workshops. Those are the best times to meet recruiters and practice networking in a low-pressure way.";
+    }
+  }
+
+  return null;
+}
+
+// Topic matching
+
+function matchTopic(q){
+  const low = q.toLowerCase();
+  const scored = KB.map(item => {
+    let score = 0;
+    for (const k of item.keywords){ if (low.includes(k)) score += 1; }
+    return { topic: item.topic, score };
+  }).sort((a,b)=>b.score-a.score);
+  const top = scored[0];
+  if (!top || top.score === 0) return null;
+  return top.topic;
+}
