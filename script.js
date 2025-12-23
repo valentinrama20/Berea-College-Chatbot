@@ -539,3 +539,81 @@ function matchTopic(q){
   if (!top || top.score === 0) return null;
   return top.topic;
 }
+
+// Blocks
+
+function linkBlock(topic){
+  const links = LINKS[topic] || [];
+  if (!links.length) return "";
+  const items = links
+    .map(l => `<li><a href="${l.url}" target="_blank" rel="noopener">${escapeHtml(l.label)}</a></li>`)
+    .join("");
+  return `\n\n<strong>Helpful links</strong>\n<ul>${items}</ul>`;
+}
+function nextSteps(topic){
+  const map = {
+    admissions: ["Check deadlines", "Start your online application", "Request your transcripts"],
+    tuition: ["Read Tuition Promise details", "Estimate non-tuition costs", "Ask Financial Aid questions"],
+    aid: ["Review Cost of Attendance", "Compare aid vs. campus earnings", "Plan books/transport"],
+    visit: ["Pick a date", "Reserve a slot", "Review parking info"],
+    intl: ["Check checklist & FAQs", "Confirm deposit requirements", "Review visa guidance"],
+    career: ["Book a résumé review", "Browse internship resources", "Attend a career workshop"],
+    registrar: ["Check the academic calendar", "Request your transcript", "Review add/drop dates"],
+    parking: ["Review permit options", "Buy a permit", "Check lot maps"]
+  };
+  const steps = map[topic] || [];
+  if (!steps.length) return "";
+  const items = steps.map(s => `<li>${escapeHtml(s)}</li>`).join("");
+  return `\n\n<strong>Next steps</strong>\n<ol>${items}</ol>`;
+}
+function buildAnswer(topic, q){
+  const baseObj = KB.find(x => x.topic === topic);
+  const base = baseObj ? baseObj.answer : "";
+  const extra = (EXPAND[topic] || "").trim();
+  const specific = specificAnswer(topic, q);
+  const intro = casualIntro(topic, q);
+
+  let bodyText = specific || base || "";
+  if (!specific && extra) {
+    bodyText = (base + "\n\n" + extra).trim();
+  }
+
+  const introHtml = intro ? `<p>${escapeHtml(intro)}</p>` : "";
+  const bodyHtml  = bodyText ? `<p>${escapeHtml(bodyText)}</p>` : "";
+
+  return `${introHtml}${bodyHtml}${linkBlock(topic)}${nextSteps(topic)}`;
+}
+
+// Small talk
+
+function handleSmallTalk(q){
+  const l = q.toLowerCase().trim();
+
+  if (/\bhow\s*(are|r)\s*(you|u)\b/.test(l) || /(how'?s|hows)\s+(it|things)\s+(going|goin)/.test(l)) {
+    return "I’m doing alright. I’m mainly here to help you with Berea College questions like admissions, tuition, majors, housing, Labor Program, visits, financial aid, and campus services.";
+  }
+
+  const greetingOnly = /\b(hi|hello|hey|yo|hiya|greetings)\b/.test(l) && !matchTopic(q);
+  if (greetingOnly) {
+    return "Hi. Ask me anything about Berea College — for example admissions, tuition, majors, campus jobs, housing, visits, or financial aid — in one short sentence.";
+  }
+
+  return null;
+}
+function findAnswer(q, topicHint=null, fromFollowup=false){
+  const small = handleSmallTalk(q);
+  if (small) return { html: `<p>${escapeHtml(small)}</p>`, topic: null };
+
+  let topic = matchTopic(q);
+  if (!topic && fromFollowup && topicHint) topic = topicHint;
+
+  if (topic) return { html: buildAnswer(topic, q), topic };
+
+  return {
+    html: `<p>I’m not totally sure what you mean. Try asking in one short sentence about admissions, tuition, majors, housing, Labor Program, visits, financial aid, or other Berea topics.</p>`,
+    topic: null
+  };
+}
+
+//Ask Flow
+
