@@ -617,3 +617,79 @@ function findAnswer(q, topicHint=null, fromFollowup=false){
 
 //Ask Flow
 
+async function ask(q, topicHint=null, fromFollowup=false){
+  addBubble(q,'me'); input.value='';
+  disableForm(true);
+
+  const loader = addLoadingBubble();
+  const { html, topic } = findAnswer(q, topicHint, fromFollowup);
+
+  renderProgressiveHTML(loader, html);
+
+  if (topic) {
+    lastTopic = topic;
+    saveRecommendations(topic);
+  } else {
+    lastTopic = null;
+  }
+
+  disableForm(false);
+  input.focus();
+}
+
+// ===============================
+// Drawer & tags
+// ===============================
+function openDrawer(){
+  drawer.classList.add('open');
+  scrim.hidden = false;
+  menuBtn.setAttribute('aria-expanded','true');
+}
+function closeDrawer(){
+  drawer.classList.remove('open');
+  scrim.hidden = true;
+  menuBtn.setAttribute('aria-expanded','false');
+}
+menuBtn.addEventListener('click', ()=> {
+  const open = drawer.classList.contains('open');
+  open ? closeDrawer() : openDrawer();
+});
+closeBtn.addEventListener('click', closeDrawer);
+scrim.addEventListener('click', closeDrawer);
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeDrawer(); });
+
+function loadTags(){
+  tagWrap.innerHTML = '';
+  for(const label of QUICK){
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tag';
+    b.textContent = label;
+    b.addEventListener('click', ()=>{ input.value = label; form.requestSubmit(); closeDrawer(); });
+    tagWrap.appendChild(b);
+  }
+}
+function welcome(){
+  addBubble(
+    "Hi, I’m the Tuishin’ You Well Bot. Ask me about Berea College — things like admissions, tuition, Labor Program jobs, majors, housing, visiting campus, financial aid, and student services."
+  );
+}
+form.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const q = input.value.trim(); if(!q) return;
+  ask(q, lastTopic, false);
+});
+input.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); form.requestSubmit(); }
+});
+if (clearBtn) {
+  clearBtn.addEventListener('click', ()=>{
+    chatBox.innerHTML=''; lastTopic = null; welcome(); input.focus();
+  });
+}
+if (saveBtn){
+  saveBtn.addEventListener('click', saveChatAsPDF);
+}
+loadTags();
+welcome();
+
