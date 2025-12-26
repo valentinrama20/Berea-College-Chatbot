@@ -637,9 +637,9 @@ async function ask(q, topicHint=null, fromFollowup=false){
   input.focus();
 }
 
-// ===============================
+
 // Drawer & tags
-// ===============================
+
 function openDrawer(){
   drawer.classList.add('open');
   scrim.hidden = false;
@@ -693,3 +693,109 @@ if (saveBtn){
 loadTags();
 welcome();
 
+
+// Mode -> feature toggle
+
+function applyMode(mode) {
+  currentMode = mode;
+  const isAccount = mode === 'account';
+
+  if (saveBtn) {
+    saveBtn.disabled = !isAccount;
+
+    if (isAccount) {
+      saveBtn.title = "Save current chat as PDF";
+    } else {
+      saveBtn.title = "Save chat is only available when you continue with an account.";
+    }
+  }
+
+  // Show/hide Account button based on mode
+
+  if (accountBtn) {
+    accountBtn.style.display = isAccount ? 'block' : 'none';
+  }
+}
+
+
+// Landing + login logic 
+
+function hideLanding(){
+  if (landing) landing.style.display = 'none';
+}
+function showLanding(){
+  if (landing) landing.style.display = 'flex';
+}
+function hideLogin(){
+  if (loginOverlay) loginOverlay.style.display = 'none';
+}
+function showLogin(){
+  if (loginOverlay) loginOverlay.style.display = 'flex';
+}
+function setMode(mode){
+  try { sessionStorage.setItem('berea_mode', mode); } catch {}
+}
+function getMode(){
+  try { return sessionStorage.getItem('berea_mode'); } catch { return null; }
+}
+
+// On load: restore mode for this tab or default to guest
+const existingMode = getMode();
+if (existingMode){
+  hideLanding();
+  hideLogin();
+  applyMode(existingMode);
+} else {
+  // No mode yet: guest features, show landing, keep login hidden
+  applyMode('guest');
+  showLanding();
+  hideLogin();
+}
+
+// Landing actions
+if (continueAccount){
+  continueAccount.addEventListener('click', ()=>{
+    // Go from landing -> login overlay (demo login)
+    hideLanding();
+    showLogin();
+  });
+}
+if (continueGuest){
+  continueGuest.addEventListener('click', ()=>{
+    setMode('guest');
+    applyMode('guest');
+    hideLanding();
+    hideLogin();
+    input.focus();
+  });
+}
+
+// Login form: continue even if fields are empty
+if (loginForm && loginContinue){
+  loginForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    hideLogin();
+    setMode('account');
+    applyMode('account');
+    input.focus();
+  });
+}
+
+// Account button behavior
+
+if (accountBtn){
+  accountBtn.addEventListener('click', ()=>{
+    addBubble(
+      "Account settings aren’t wired up yet in this demo. In a full version, this is where you’d manage your profile or saved chats.",
+      "bot"
+    );
+    closeDrawer();
+  });
+}
+
+
+// Additions
+
+EXPAND.studyabroad = `• Options: semester/year exchanges, summer/short-term faculty-led, and independent programs
+• Support: advising, course approvals, and scholarship guidance
+• Plan early: language prep, finances, and credit transfer steps`;
